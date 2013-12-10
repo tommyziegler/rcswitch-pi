@@ -8,10 +8,14 @@
 
 #include "HomeControl.h"
 
+#include <stdio.h>
+#include <string.h>
+
+
 #ifndef HomeControlAPI_h
 #define HomeControlAPI_h
 
-static void SwitchElro(char* inSystemCode, char* inUnitCode, const bool switchOn) {
+static void SwitchElro(char* inSystemCode, char* inUnitCode, bool switchOn) {
     int unitDigit;
     if (strcmp(inUnitCode, "A") == 0) {
         unitDigit = 1;
@@ -30,11 +34,11 @@ static void SwitchElro(char* inSystemCode, char* inUnitCode, const bool switchOn
     }
 
     // TODO: add SystemCode check 00000 - 11111
-    
+
     int kPIN = 0;
     HomeControl myHome = HomeControl();
     myHome.enableTransmit(kPIN);
-    
+
     if(switchOn) {
         printf("sending ON to Elro Switch: inSystemCode[%s] inUnitCode[%s]\n", inSystemCode, inUnitCode);
         myHome.switchOn(inSystemCode, unitDigit);
@@ -44,7 +48,7 @@ static void SwitchElro(char* inSystemCode, char* inUnitCode, const bool switchOn
     }
 }
 
-static void SwitchRev(char* inSystemCode, int inUnitCode, const bool switchOn) {
+static void SwitchRev(char* inSystemCode, int inUnitCode, bool switchOn) {
     char systemDigit;
     if (strcmp(inSystemCode, "A") == 0) {
         systemDigit = 'A';
@@ -61,11 +65,11 @@ static void SwitchRev(char* inSystemCode, int inUnitCode, const bool switchOn) {
     }
 
     // TODO: add UnitCode check here 1 - 3
-    
+
     int kPIN = 0;
     HomeControl myHome = HomeControl();
     myHome.enableTransmit(kPIN);
-    
+
     if(switchOn) {
         printf("sending ON to REV Switch: inSystemCode[%s] inUnitCode[%i]\n", inSystemCode, inUnitCode);
         myHome.switchOnD(systemDigit, inUnitCode);

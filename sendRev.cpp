@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 int main(int argc, const char * argv[])
-{    
-    SwitchRev(argv[1], atoi(argv[2]), atoi(argv[3]));
+{
+    SwitchRev((char*)argv[1], (int)atoi(argv[2]), (bool)atoi(argv[3]));
     return 0;
 }

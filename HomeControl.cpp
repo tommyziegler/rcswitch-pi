@@ -1,34 +1,34 @@
 /*
  Author of HomeControl is Tommy Ziegler - http://tommyziegler.com
- 
+
  This file is a for of the RCSwitch class from https://github.com/denschu/rcswitch-pi
  ------------------------------------------------------------------------------------
  Original license text:
- 
+
  RCSwitch - Arduino libary for remote control outlet switches
  Copyright (c) 2011 Suat �zg�r.  All right reserved.
- 
+
  Contributors:
  - Andre Koehler / info(at)tomate-online(dot)de
  - Gordeev Andrey Vladimirovich / gordeev(at)openpyro(dot)com
  - Skineffect / http://forum.ardumote.com/viewtopic.php?f=2&t=48
- 
+
  Project home: http://code.google.com/p/rc-switch/
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- 
+
  ------------------------------------------------------------------------------------
  When there are questions, please contact me under: me@tommyziegler.com
  */
@@ -50,7 +50,7 @@ HomeControl::HomeControl() {
     this->nReceiverInterrupt = -1;
     this->nTransmitterPin = -1;
     HomeControl::nReceivedValue = NULL;
-    
+
     this->setPulseLength(350);
     this->setRepeatTransmit(10);
     this->setReceiveTolerance(60);
@@ -113,9 +113,9 @@ void HomeControl::setReceiveTolerance(int nPercent) {
  */
 void HomeControl::enableTransmit(int nTransmitterPin) {
     this->nTransmitterPin = nTransmitterPin;
-    
+
     // ******** wiringPi
-    //pinMode(this->nTransmitterPin, OUTPUT);
+    pinMode(this->nTransmitterPin, OUTPUT);
     printf("wiringPi.h -> pinMode(this->nTransmitterPin, OUTPUT); %i\n", this->nTransmitterPin);
 
 }
@@ -240,7 +240,7 @@ void HomeControl::switchOn(char* sGroup, int nChannel) {
  */
 void HomeControl::switchOff(char* sGroup, int nChannel) {
     printf("HomeControl::switchOff(char* sGroup, int nChannel): sGroup[%s], nChannel[%d]\n", sGroup, nChannel);
-    
+
     char* code[6] = { "00000", "10000", "01000", "00100", "00010", "00001" };
     this->switchOffA(sGroup, code[nChannel]);
 }
@@ -253,11 +253,11 @@ void HomeControl::switchOff(char* sGroup, int nChannel) {
  */
 char* HomeControl::getCodeWordA(char* sGroup, char* sDevice, boolean bOn) {
     printf("HomeControl::getCodeWordA(char* sGroup, char* sDevice, boolean bOn): sGroup[%s], sDevice[%s], bOn[%d]\n", sGroup, sDevice, bOn);
-    
+
     static char sDipSwitches[13];
     int i = 0;
     int j = 0;
-    
+
     for (i=0; i < 5; i++) {
         if (sGroup[i] == '0') {
             sDipSwitches[j++] = 'F';
@@ -265,7 +265,7 @@ char* HomeControl::getCodeWordA(char* sGroup, char* sDevice, boolean bOn) {
             sDipSwitches[j++] = '0';
         }
     }
-    
+
     for (i=0; i < 5; i++) {
         if (sDevice[i] == '0') {
             sDipSwitches[j++] = 'F';
@@ -273,7 +273,7 @@ char* HomeControl::getCodeWordA(char* sGroup, char* sDevice, boolean bOn) {
             sDipSwitches[j++] = '0';
         }
     }
-    
+
     if ( bOn ) {
         sDipSwitches[j++] = '0';
         sDipSwitches[j++] = 'F';
@@ -281,9 +281,9 @@ char* HomeControl::getCodeWordA(char* sGroup, char* sDevice, boolean bOn) {
         sDipSwitches[j++] = 'F';
         sDipSwitches[j++] = '0';
     }
-    
+
     sDipSwitches[j] = '\0';
-    
+
     return sDipSwitches;
 }
 
@@ -305,10 +305,10 @@ char* HomeControl::getCodeWordA(char* sGroup, char* sDevice, boolean bOn) {
  */
 char* HomeControl::getCodeWordB(int nAddressCode, int nChannelCode, boolean bStatus) {
     printf("HomeControl::getCodeWordB(int nAddressCode, int nChannelCode, boolean bStatus): nAddressCode[%d], nChannelCode[%d], bStatus[%d]\n", nAddressCode, nChannelCode, bStatus);
-    
+
     int nReturnPos = 0;
     static char sReturn[13];
-    
+
     char* code[5] = { "FFFF", "0FFF", "F0FF", "FF0F", "FFF0" };
     if (nAddressCode < 1 || nAddressCode > 4 || nChannelCode < 1 || nChannelCode > 4) {
         return '\0';
@@ -316,23 +316,23 @@ char* HomeControl::getCodeWordB(int nAddressCode, int nChannelCode, boolean bSta
     for (int i = 0; i<4; i++) {
         sReturn[nReturnPos++] = code[nAddressCode][i];
     }
-    
+
     for (int i = 0; i<4; i++) {
         sReturn[nReturnPos++] = code[nChannelCode][i];
     }
-    
+
     sReturn[nReturnPos++] = 'F';
     sReturn[nReturnPos++] = 'F';
     sReturn[nReturnPos++] = 'F';
-    
+
     if (bStatus) {
         sReturn[nReturnPos++] = 'F';
     } else {
         sReturn[nReturnPos++] = '0';
     }
-    
+
     sReturn[nReturnPos] = '\0';
-    
+
     return sReturn;
 }
 
@@ -344,11 +344,11 @@ char* HomeControl::getCodeWordC(char sFamily, int nGroup, int nDevice, boolean b
 
     static char sReturn[13];
     int nReturnPos = 0;
-    
+
     if ( (byte)sFamily < 97 || (byte)sFamily > 112 || nGroup < 1 || nGroup > 4 || nDevice < 1 || nDevice > 4) {
         return '\0';
     }
-    
+
     char* sDeviceGroupCode =  dec2binWzerofill(  (nDevice-1) + (nGroup-1)*4, 4  );
     char familycode[16][5] = { "0000", "F000", "0F00", "FF00", "00F0", "F0F0", "0FF0", "FFF0", "000F", "F00F", "0F0F", "FF0F", "00FF", "F0FF", "0FFF", "FFFF" };
     for (int i = 0; i<4; i++) {
@@ -394,7 +394,7 @@ char* HomeControl::getCodeWordD(char sGroup, int nDevice, boolean bStatus){
 
     static char sReturn[13];
     int nReturnPos = 0;
-    
+
     // Building 4 bits address
     // (Potential problem if dec2binWcharfill not returning correct string)
     char *sGroupCode;
@@ -414,13 +414,13 @@ char* HomeControl::getCodeWordD(char sGroup, int nDevice, boolean bStatus){
         default:
             return '\0';
     }
-    
+
     for (int i = 0; i<4; i++)
     {
         sReturn[nReturnPos++] = sGroupCode[i];
     }
-    
-    
+
+
     // Building 3 bits address
     // (Potential problem if dec2binWcharfill not returning correct string)
     char *sDevice;
@@ -434,24 +434,24 @@ char* HomeControl::getCodeWordD(char sGroup, int nDevice, boolean bStatus){
         default:
             return '\0';
     }
-    
+
     for (int i = 0; i<3; i++)
         sReturn[nReturnPos++] = sDevice[i];
-    
+
     // fill up rest with zeros
     for (int i = 0; i<5; i++)
         sReturn[nReturnPos++] = '0';
-    
+
     // encode on or off
     if (bStatus)
         sReturn[10] = '1';
     else
         sReturn[11] = '1';
-    
+
     // last position terminate string
     sReturn[12] = '\0';
     return sReturn;
-    
+
 }
 
 /**
@@ -459,7 +459,7 @@ char* HomeControl::getCodeWordD(char sGroup, int nDevice, boolean bStatus){
  */
 void HomeControl::sendTriState(char* sCodeWord) {
     printf("HomeControl::sendTriState: %s\n", sCodeWord);
-    
+
     for (int nRepeat=0; nRepeat<nRepeatTransmit; nRepeat++) {
         int i = 0;
         while (sCodeWord[i] != '\0') {
@@ -478,7 +478,7 @@ void HomeControl::sendTriState(char* sCodeWord) {
         }
         this->sendSync();
         printf("\n\n", sCodeWord);
-        
+
     }
 }
 
@@ -489,7 +489,7 @@ void HomeControl::send(unsigned long Code, unsigned int length) {
 
 void HomeControl::send(char* sCodeWord) {
     printf("HomeControl::send(char* sCodeWord)\n");
-    
+
     for (int nRepeat=0; nRepeat<nRepeatTransmit; nRepeat++) {
         int i = 0;
         while (sCodeWord[i] != '\0') {
@@ -509,7 +509,7 @@ void HomeControl::send(char* sCodeWord) {
 
 void HomeControl::transmit(int nHighPulses, int nLowPulses) {
     printf("HomeControl::transmit()\n");
-    
+
     boolean disabled_Receive = false;
     int nReceiverInterrupt_backup = nReceiverInterrupt;
     if (this->nTransmitterPin != -1) {
@@ -517,19 +517,19 @@ void HomeControl::transmit(int nHighPulses, int nLowPulses) {
             this->disableReceive();
             disabled_Receive = true;
         }
-        
-        
+
+
         // ******** wiringPi
-        //digitalWrite(this->nTransmitterPin, HIGH);
+        digitalWrite(this->nTransmitterPin, HIGH);
         printf("wiringPi.h -> digitalWrite(this->nTransmitterPin, HIGH); %i\n", this->nTransmitterPin);
-        //delayMicroseconds( this->nPulseLength * nHighPulses);
+        delayMicroseconds( this->nPulseLength * nHighPulses);
         printf("wiringPi.h -> delayMicroseconds(this->nPulseLength * nHighPulses); %i * %i\n", this->nPulseLength, nHighPulses);
-        //digitalWrite(this->nTransmitterPin, LOW);
+        digitalWrite(this->nTransmitterPin, LOW);
         printf("wiringPi.h -> digitalWrite(this->nTransmitterPin, LOW); %i\n", this->nTransmitterPin);
-        //delayMicroseconds( this->nPulseLength * nLowPulses);
+        delayMicroseconds( this->nPulseLength * nLowPulses);
         printf("wiringPi.h -> delayMicroseconds(this->nPulseLength * nLowPulses); %i * %i\n", this->nPulseLength, nLowPulses);
-        
-        
+
+
         if(disabled_Receive){
             this->enableReceive(nReceiverInterrupt_backup);
         }
@@ -544,7 +544,7 @@ void HomeControl::transmit(int nHighPulses, int nLowPulses) {
  */
 void HomeControl::send0() {
     printf("HomeControl::send0()\n");
-    
+
     if (this->nProtocol == 1){
         this->transmit(1,3);
     }
@@ -565,7 +565,7 @@ void HomeControl::send0() {
  */
 void HomeControl::send1() {
     printf("HomeControl::send1()\n");
-    
+
     if (this->nProtocol == 1){
         this->transmit(3,1);
     }
@@ -585,7 +585,7 @@ void HomeControl::send1() {
  */
 void HomeControl::sendT0() {
     printf("HomeControl::sendT0()\n");
-    
+
     this->transmit(1,3);
     this->transmit(1,3);
 }
@@ -597,7 +597,7 @@ void HomeControl::sendT0() {
  */
 void HomeControl::sendT1() {
     printf("HomeControl::sendT1()\n");
-    
+
     this->transmit(3,1);
     this->transmit(3,1);
 }
@@ -609,7 +609,7 @@ void HomeControl::sendT1() {
  */
 void HomeControl::sendTF() {
     printf("HomeControl::sendTF()\n");
-    
+
     this->transmit(1,3);
     this->transmit(3,1);
 }
@@ -623,7 +623,7 @@ void HomeControl::sendTF() {
  */
 void HomeControl::sendSync() {
     printf("HomeControl::sendSync()\n");
-    
+
     if (this->nProtocol == 1){
         printf("HomeControl::sendSync() nProtocol 1\n");
         this->transmit(1,31);
@@ -674,7 +674,7 @@ bool HomeControl::available() {
 
 void HomeControl::resetAvailable() {
     printf("HomeControl::resetAvailable()\n");
-    
+
     HomeControl::nReceivedValue = NULL;
 }
 
@@ -703,13 +703,13 @@ unsigned int* HomeControl::getReceivedRawdata() {
  */
 bool HomeControl::receiveProtocol1(unsigned int changeCount){
     printf("HomeControl::receiveProtocol1()\n");
-    
+
     unsigned long code = 0;
     unsigned long delay = HomeControl::timings[0] / 31;
     unsigned long delayTolerance = delay * HomeControl::nReceiveTolerance * 0.01;
-    
+
     for (int i = 1; i<changeCount ; i=i+2) {
-        
+
         if (HomeControl::timings[i] > delay-delayTolerance && HomeControl::timings[i] < delay+delayTolerance && HomeControl::timings[i+1] > delay*3-delayTolerance && HomeControl::timings[i+1] < delay*3+delayTolerance) {
             code = code << 1;
         } else if (HomeControl::timings[i] > delay*3-delayTolerance && HomeControl::timings[i] < delay*3+delayTolerance && HomeControl::timings[i+1] > delay-delayTolerance && HomeControl::timings[i+1] < delay+delayTolerance) {
@@ -728,7 +728,7 @@ bool HomeControl::receiveProtocol1(unsigned int changeCount){
         HomeControl::nReceivedDelay = delay;
         HomeControl::nReceivedProtocol = 1;
     }
-    
+
     if (code == 0){
         return false;
     }else if (code != 0) {
@@ -740,13 +740,13 @@ bool HomeControl::receiveProtocol1(unsigned int changeCount){
 
 bool HomeControl::receiveProtocol2(unsigned int changeCount){
     printf("HomeControl::receiveProtocol2()\n");
-    
+
     unsigned long code = 0;
     unsigned long delay = HomeControl::timings[0] / 10;
     unsigned long delayTolerance = delay * HomeControl::nReceiveTolerance * 0.01;
-    
+
     for (int i = 1; i<changeCount ; i=i+2) {
-        
+
         if (HomeControl::timings[i] > delay-delayTolerance && HomeControl::timings[i] < delay+delayTolerance && HomeControl::timings[i+1] > delay*2-delayTolerance && HomeControl::timings[i+1] < delay*2+delayTolerance) {
             code = code << 1;
         } else if (HomeControl::timings[i] > delay*2-delayTolerance && HomeControl::timings[i] < delay*2+delayTolerance && HomeControl::timings[i+1] > delay-delayTolerance && HomeControl::timings[i+1] < delay+delayTolerance) {
@@ -765,13 +765,13 @@ bool HomeControl::receiveProtocol2(unsigned int changeCount){
         HomeControl::nReceivedDelay = delay;
         HomeControl::nReceivedProtocol = 2;
     }
-    
+
     if (code == 0){
         return false;
     }else if (code != 0){
         return true;
     }
-    
+
     return true;
 }
 
@@ -780,13 +780,13 @@ bool HomeControl::receiveProtocol2(unsigned int changeCount){
  */
 bool HomeControl::receiveProtocol3(unsigned int changeCount){
     printf("HomeControl::receiveProtocol3()\n");
-    
+
     unsigned long code = 0;
     unsigned long delay = HomeControl::timings[0] / PROTOCOL3_SYNC_FACTOR;
     unsigned long delayTolerance = delay * HomeControl::nReceiveTolerance * 0.01;
-    
+
     for (int i = 1; i<changeCount ; i=i+2) {
-        
+
         if  (HomeControl::timings[i]   > delay*PROTOCOL3_0_HIGH_CYCLES - delayTolerance
              && HomeControl::timings[i]   < delay*PROTOCOL3_0_HIGH_CYCLES + delayTolerance
              && HomeControl::timings[i+1] > delay*PROTOCOL3_0_LOW_CYCLES  - delayTolerance
@@ -811,13 +811,13 @@ bool HomeControl::receiveProtocol3(unsigned int changeCount){
         HomeControl::nReceivedDelay = delay;
         HomeControl::nReceivedProtocol = 3;
     }
-    
+
     if (code == 0){
         return false;
     }else if (code != 0){
         return true;
     }
-    
+
     return true;
 }
 
@@ -831,12 +831,12 @@ char* HomeControl::dec2binWzerofill(unsigned long Dec, unsigned int bitLength){
 char* HomeControl::dec2binWcharfill(unsigned long Dec, unsigned int bitLength, char fill){
     static char bin[64];
     unsigned int i=0;
-    
+
     while (Dec > 0) {
         bin[32+i++] = ((Dec & 1) > 0) ? '1' : fill;
         Dec = Dec >> 1;
     }
-    
+
     for (unsigned int j = 0; j< bitLength; j++) {
         if (j >= bitLength - i) {
             bin[j] = bin[ 31 + i - (j - (bitLength - i)) ];
@@ -845,6 +845,6 @@ char* HomeControl::dec2binWcharfill(unsigned long Dec, unsigned int bitLength, c
         }
     }
     bin[bitLength] = '\0';
-    
+
     return bin;
 }
