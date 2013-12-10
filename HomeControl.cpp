@@ -457,8 +457,6 @@ void HomeControl::sendTriState(char* sCodeWord) {
             i++;
         }
         this->sendSync();
-        printf("\n\n", sCodeWord);
-
     }
 }
 
