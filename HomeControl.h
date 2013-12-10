@@ -1,37 +1,37 @@
 /*
- Author of HomeControl is Tommy Ziegler - http://tommyziegler.com
+  Author of HomeControl is Tommy Ziegler - http://tommyziegler.com
 
- This file is a for of the RCSwitch class from https://github.com/denschu/rcswitch-pi
- ------------------------------------------------------------------------------------
- Original license text:
+  This file is a for of the RCSwitch class from https://github.com/denschu/rcswitch-pi
+  ------------------------------------------------------------------------------------
+  Original license text:
 
- RCSwitch - Arduino libary for remote control outlet switches
- Copyright (c) 2011 Suat ‚Ä¶zg≈∏r.  All right reserved.
+  RCSwitch - Arduino libary for remote control outlet switches
+  Copyright (c) 2011 Suat Özgür.  All right reserved.
 
- Contributors:
- - Andre Koehler / info(at)tomate-online(dot)de
- - Gordeev Andrey Vladimirovich / gordeev(at)openpyro(dot)com
- - Skineffect / http://forum.ardumote.com/viewtopic.php?f=2&t=48
+  Contributors:
+  - Andre Koehler / info(at)tomate-online(dot)de
+  - Gordeev Andrey Vladimirovich / gordeev(at)openpyro(dot)com
+  - Skineffect / http://forum.ardumote.com/viewtopic.php?f=2&t=48
 
- Project home: http://code.google.com/p/rc-switch/
+  Project home: http://code.google.com/p/rc-switch/
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
- ------------------------------------------------------------------------------------
- When there are questions, please contact me under: me@tommyziegler.com
- */
+  ------------------------------------------------------------------------------------
+  When there are questions, please contact me under: me@tommyziegler.com
+*/
 
 #ifndef _HomeControl_h
 #define _HomeControl_h
@@ -41,24 +41,19 @@
 #else
     #include <wiringPi.h>
     #include <stdint.h>
-
     #define NULL 0
     #define CHANGE 1
-
-    #ifdef __cplusplus
-        extern "C"{
-    #endif
-
-    typedef uint8_t boolean;
-    typedef uint8_t byte;
+#ifdef __cplusplus
+extern "C"{
+#endif
+typedef uint8_t boolean;
+typedef uint8_t byte;
 
 #if !defined(NULL)
 #endif
-
-    #ifdef __cplusplus
-        }
-    #endif
-
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 
@@ -74,7 +69,7 @@
 
 class HomeControl {
 
-public:
+  public:
     HomeControl();
 
     void switchOn(char* sGroup, int nSwitchNumber);
@@ -82,32 +77,32 @@ public:
 
     void switchOnA(char* sGroup, char* sDevice);
     void switchOffA(char* sGroup, char* sDevice);
-
+    
     void switchOnB(int nGroupNumber, int nSwitchNumber);
     void switchOffB(int nGroupNumber, int nSwitchNumber);
-
+    
     void switchOnC(char sFamily, int nGroup, int nDevice);
     void switchOffC(char sFamily, int nGroup, int nDevice);
-
+    
     void switchOnD(char sGroup, int nDevice);
     void switchOffD(char sGroup, int nDevice);
-
+    
     void sendTriState(char* Code);
     void send(unsigned long Code, unsigned int length);
     void send(char* Code);
-
+    
     void enableReceive(int interrupt);
     void enableReceive();
     void disableReceive();
     bool available();
     void resetAvailable();
-
+  
     unsigned long getReceivedValue();
     unsigned int getReceivedBitlength();
     unsigned int getReceivedDelay();
     unsigned int getReceivedProtocol();
     unsigned int* getReceivedRawdata();
-
+  
     void enableTransmit(int nTransmitterPin);
     void disableTransmit();
     void setPulseLength(int nPulseLength);
@@ -115,8 +110,8 @@ public:
     void setReceiveTolerance(int nPercent);
     void setProtocol(int nProtocol);
     void setProtocol(int nProtocol, int nPulseLength);
-
-private:
+  
+  private:
     char* getCodeWordB(int nGroupNumber, int nSwitchNumber, boolean bStatus);
     char* getCodeWordA(char* sGroup, int nSwitchNumber, boolean bStatus);
     char* getCodeWordA(char* sGroup, char* sDevice, boolean bStatus);
@@ -132,7 +127,7 @@ private:
 
     static char* dec2binWzerofill(unsigned long dec, unsigned int length);
     static char* dec2binWcharfill(unsigned long dec, unsigned int length, char fill);
-
+ 
     static void handleInterrupt();
     static bool receiveProtocol1(unsigned int changeCount);
     static bool receiveProtocol2(unsigned int changeCount);
@@ -150,6 +145,7 @@ private:
     static unsigned int nReceivedProtocol;
     static unsigned int timings[HOMECTRLSWITCH_MAX_CHANGES];
 
+    
 };
 
 #endif
